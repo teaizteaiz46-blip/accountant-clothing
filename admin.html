@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة تحكم المدير</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .tabs { display: flex; border-bottom: 2px solid #ccc; }
+        .tab-button { padding: 10px 20px; cursor: pointer; background: #eee; }
+        .tab-button.active { background: #fff; border-bottom: 2px solid #007bff; }
+        .tab-content { display: none; padding: 20px 0; }
+        .tab-content.active { display: block; }
+        .order { border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; }
+        .order-header { font-weight: bold; }
+        .order-details { margin-top: 10px; }
+        .dashboard-metric { background: #f4f4f4; padding: 20px; margin-bottom: 10px; border-radius: 8px; }
+
+        /* هذا الكود سيُنفذ فقط عند الطباعة */
+@media print {
+    /* 1. إخفاء كل شيء في الصفحة (التابات، الأزرار...) */
+    body > *:not(#print-slip-container) {
+        display: none;
+        visibility: hidden;
+    }
+    
+    /* 2. إظهار البوليصة فقط وجعلها تملأ الصفحة */
+    #print-slip-container {
+        display: block !important;
+        visibility: visible !important;
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+    }
+    
+    /* 3. تنسيق البوليصة للطباعة */
+    #print-slip {
+        border: none;
+        padding: 0;
+        font-size: 14pt; /* خط أكبر للورق */
+    }
+}
+/* هذا الكلاس سنضيفه لكل بوليصة */
+.print-slip-page {
+    /* هذا هو الأمر السحري: يجبر المتصفح على بدء صفحة جديدة بعد كل بوليصة */
+    page-break-after: always;
+    
+    /* هذا لترتيب الشكل على الشاشة فقط (قبل الطباعة) */
+    border-bottom: 2px dashed #000;
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+}
+
+@media print {
+    /* عند الطباعة، لا نحتاج للحدود والفراغات */
+    .print-slip-page {
+        border-bottom: none;
+        padding-bottom: 0;
+        margin-bottom: 0;
+    }
+}
+    </style>
+</head>
+<body>
+
+    <h1>لوحة التحكم</h1>
+
+    <div class="tabs">
+        <button class="tab-button active" onclick="showTab('orders')">إدارة الطلبات</button>
+        <button class="tab-button" onclick="showTab('dashboard')">لوحة الأرباح</button>
+    </div>
+
+    <div id="orders" class="tab-content active">
+        <h2>الطلبات الجديدة (تحت المراجعة)</h2>
+        <button id="print-selected-btn" style="background-color: #28a745; color: white; padding: 10px; margin-bottom: 10px; border: none; cursor: pointer;">
+    🖨️ طباعة الطلبات المحددة
+</button>
+        <div id="new-orders-list">
+            </div>
+
+        <h2>الطلبات المجهزة (تم الشحن)</h2>
+        <div id="processed-orders-list">
+            </div>
+    </div>
+
+    <div id="dashboard" class="tab-content">
+        <h2>ملخص الأرباح (آخر 30 يوم)</h2>
+        <div id="dashboard-summary">
+            <div class="dashboard-metric">
+                <h3>إجمالي المبيعات</h3>
+                <span id="total-sales">0</span> دينار
+            </div>
+            <div class="dashboard-metric">
+                <h3>إجمالي الكلفة</h3>
+                <span id="total-cost">0</span> دينار
+            </div>
+            <div class="dashboard-metric">
+                <h3>صافي الأرباح</h3>
+                <span id="total-profit">0</span> دينار
+            </div>
+        </div>
+        
+        <h2>تفاصيل ربح كل طلب (تم التوصيل)</h2>
+        <div id="order-profit-list">
+            </div>
+    </div>
+
+    <div id="print-slip-container" style="display: none;">
+        <div id="print-slip">
+            </div>
+    </div>
+
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="admin.js"></script>
+
+</body>
+</html>
